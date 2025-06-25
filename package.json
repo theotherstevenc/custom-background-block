@@ -1,14 +1,16 @@
 {
   "name": "custom-background-block",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "start": "npx nodemon app.js",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tag": "git tag -a $npm_package_version -m \"Release version $npm_package_version\" && git push origin $npm_package_version"
+
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
