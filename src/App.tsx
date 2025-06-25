@@ -6,25 +6,43 @@ import SDK from 'blocksdk'
 const sdk = new SDK(null, null, true)
 
 function App() {
-  const [imageURL, setImageURL] = useState<string>(sdk.getData('imageURL') || '')
-  const [imageWidth, setImageWidth] = useState<string>(sdk.getData('imageWidth') || '')
-  const [imageHeight, setImageHeight] = useState<string>(sdk.getData('imageHeight') || '')
-  const [textOverlay, setTextOverlay] = useState<string>(sdk.getData('textOverlay') || '')
-  const [textColor, setTextColor] = useState<string>(sdk.getData('textColor') || '#000000')
-  const [textBackgroundColor, setTextBackgroundColor] = useState<string>(
-    sdk.getData('textBackgroundColor') || '#ffffff'
-  )
+  const [imageURL, setImageURL] = useState<string>(sdk.getData('imageURL') || 'https://placecats.com/millie/500/500')
+  const [imageWidth, setImageWidth] = useState<string>(sdk.getData('imageWidth') || '500')
+  const [imageHeight, setImageHeight] = useState<string>(sdk.getData('imageHeight') || '500')
+  const [textOverlay, setTextOverlay] = useState<string>(sdk.getData('textOverlay') || 'scratch or die')
+  const [textColor, setTextColor] = useState<string>(sdk.getData('textColor') || 'orange')
+  const [textBackgroundColor, setTextBackgroundColor] = useState<string>(sdk.getData('textBackgroundColor') || 'black')
 
   useEffect(() => {
-    sdk.setContent(`
-        <div style="display:table; width:100%; max-width:${imageWidth}px; background-image:url('${imageURL}'); background-size: cover; text-align: center; color: ${textColor};">
-          <div style="display:inline-block; width:0; vertical-align:middle; padding-bottom:${
-            (Number(imageHeight) / Number(imageWidth)) * 100
-          }%;"></div>
-          <div style="display:inline-block; width:100%; background:${textBackgroundColor};">${textOverlay}</div>
-        </div>
-      </div>
-    `)
+    const markUp = `
+    <table role="none" style="width:${imageWidth}px;" cellpadding="0" cellspacing="0" border="0" class="w100pc">
+      <tr>
+        <td align="center" bgcolor="${textBackgroundColor}" background="${imageURL}" width="${imageWidth}" height="${imageHeight}" valign="middle" style="color: ${textColor}; background: url(${imageURL}) center / cover no-repeat ${textBackgroundColor}; background-position: center; background-size: cover; background-repeat: no-repeat;" class="w100pc">
+          <!--[if gte mso 9]>
+          <v:image xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style=" border: 0;display: inline-block; width: ${
+            Number(imageWidth) * 0.75
+          }pt; height: ${Number(imageHeight) * 0.75}pt;" src="${imageURL}" />
+          <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="f" stroke="false" style="border: 0;display: inline-block;position: absolute; width: ${
+            Number(imageWidth) * 0.75
+          }pt; height:${Number(imageHeight) * 0.75}pt;">
+            <v:fill opacity="0%" color="${textBackgroundColor}" />
+            <v:textbox inset="0,0,0,0">
+          <![endif]-->
+                  <table role="none" style="width:${imageWidth}px;" cellpadding="0" cellspacing="0" border="0" class="w100pc">
+                    <tr>
+                      <td align="center" bgcolor="${textBackgroundColor}">${textOverlay}</td>
+                    </tr>
+                  </table>
+          <!--[if gte mso 9]>
+            </v:textbox>
+          </v:rect>
+          <![endif]-->
+        </td>
+      </tr>
+    </table>
+`
+
+    sdk.setContent(markUp)
   }, [imageURL, imageWidth, imageHeight, textOverlay, textColor, textBackgroundColor])
 
   const handleImageURL = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,7 +120,6 @@ function App() {
           variant='outlined'
           type='color'
           fullWidth
-          value={textColor}
           onChange={handleTextColor}
         />
         <TextField
@@ -111,7 +128,6 @@ function App() {
           variant='outlined'
           type='color'
           fullWidth
-          value={textBackgroundColor}
           onChange={handleTextBackgroundColor}
         />
       </Box>
