@@ -32,11 +32,7 @@ function App() {
             <v:fill opacity="0%" color="${imageBackgroundColor}" />
             <v:textbox inset="0,0,0,0">
           <![endif]-->
-                  <table role="none" style="width:${imageWidth}px;" cellpadding="0" cellspacing="0" border="0" class="iner-tbl">
-                    <tr>
-                      <td align="center" bgcolor="${textBackgroundColor}">${textOverlay}</td>
-                    </tr>
-                  </table>
+                  <div data-type="slot" data-key="" data-label="custom background content"></div>
           <!--[if gte mso 9]>
             </v:textbox>
           </v:rect>
