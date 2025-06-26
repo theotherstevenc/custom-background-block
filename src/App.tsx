@@ -1,7 +1,15 @@
 import { Box } from '@mui/material'
+import Autocomplete from '@mui/material/Autocomplete'
 import TextField from '@mui/material/TextField'
 import { useEffect, useState } from 'react'
 import SDK from 'blocksdk'
+
+interface GoogleFontsResponse {
+  fonts: string[]
+  count: number
+  limit: number
+  sortBy: string
+}
 
 const sdk = new SDK(null, null, true)
 
@@ -12,6 +20,38 @@ function App() {
   const [textOverlay, setTextOverlay] = useState<string>(sdk.getData('textOverlay') || 'scratch or die')
   const [textColor, setTextColor] = useState<string>(sdk.getData('textColor') || 'orange')
   const [textBackgroundColor, setTextBackgroundColor] = useState<string>(sdk.getData('textBackgroundColor') || 'black')
+  const [googleFonts, setGoogleFonts] = useState<GoogleFontsResponse | null>(null)
+
+  const handleChange = (_event: React.SyntheticEvent, value: string[]) => {
+    console.log('Selected Google Fonts:', value)
+  }
+
+  const API_URL = 'http://localhost:5173/api/fonts'
+  const HTTP_METHOD_POST = 'GET'
+
+  const getGoogleFonts = async () => {
+    try {
+      const response = await fetch(API_URL, {
+        method: HTTP_METHOD_POST,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      setGoogleFonts(data)
+    } catch (error) {
+      console.error('Error fetching Google Fonts:', error)
+    }
+  }
+
+  useEffect(() => {
+    getGoogleFonts()
+  }, [])
 
   useEffect(() => {
     const markUp = `
@@ -41,7 +81,7 @@ function App() {
       </tr>
     </table>
 `
-
+    console.log('MarkUp:', markUp)
     sdk.setContent(markUp)
   }, [imageURL, imageWidth, imageHeight, textOverlay, textColor, textBackgroundColor])
 
@@ -114,21 +154,17 @@ function App() {
           onChange={handleTextOverlay}
           slotProps={{ inputLabel: { shrink: true } }}
         />
-        <TextField
-          id='outlined-basic'
-          label='Text Color'
-          variant='outlined'
-          type='color'
-          fullWidth
-          onChange={handleTextColor}
-        />
-        <TextField
-          id='outlined-basic'
-          label='Text Background Color'
-          variant='outlined'
-          type='color'
-          fullWidth
-          onChange={handleTextBackgroundColor}
+        <TextField id='outlined-basic' label='Text Color' variant='outlined' type='color' fullWidth onChange={handleTextColor} />
+        <TextField id='outlined-basic' label='Text Background Color' variant='outlined' type='color' fullWidth onChange={handleTextBackgroundColor} />
+
+        <Autocomplete
+          multiple
+          fullWidth={true}
+          id='multiple-limit-tags'
+          options={googleFonts?.fonts || []}
+          getOptionLabel={(fontName) => fontName}
+          renderInput={(params) => <TextField {...params} label='Select Google Fonts' placeholder='Favorites' />}
+          onChange={handleChange}
         />
       </Box>
     </>
